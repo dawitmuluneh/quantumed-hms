@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -38,31 +39,38 @@ export class AuditLogService {
   }
 
   async write(input: AuditWriteInput): Promise<void> {
-    const last = await this.prisma.auditLog.findFirst({
-      orderBy: { id: 'desc' },
-      select: { hash: true },
-    });
-    const prevHash = last?.hash ?? null;
-    const hash = this.computeHash(prevHash, input);
-
     try {
-      await this.prisma.auditLog.create({
-        data: {
-          hospitalId: input.hospitalId ?? null,
-          actorUserId: input.actorUserId ?? null,
-          actorRole: input.actorRole ?? null,
-          action: input.action,
-          resource: input.resource,
-          resourceId: input.resourceId ?? null,
-          outcome: input.outcome ?? 'SUCCESS',
-          ipAddress: input.ipAddress ?? null,
-          userAgent: input.userAgent ?? null,
-          requestId: input.requestId ?? null,
-          payload: (input.payload as object | null) ?? undefined,
-          prevHash,
-          hash,
+      await this.prisma.$transaction(
+        async (tx) => {
+          // SELECT ... FOR UPDATE on the tip of the chain so concurrent writers
+          // serialize behind us. SERIALIZABLE on its own is not enough because
+          // the predecessor row is not modified — only read — so two readers
+          // would both see the same prev hash and insert siblings. ADR-0004.
+          const last = await tx.$queryRaw<Array<{ hash: string }>>(
+            Prisma.sql`SELECT hash FROM platform.audit_log ORDER BY id DESC LIMIT 1 FOR UPDATE`,
+          );
+          const prevHash = last[0]?.hash ?? null;
+          const hash = this.computeHash(prevHash, input);
+          await tx.auditLog.create({
+            data: {
+              hospitalId: input.hospitalId ?? null,
+              actorUserId: input.actorUserId ?? null,
+              actorRole: input.actorRole ?? null,
+              action: input.action,
+              resource: input.resource,
+              resourceId: input.resourceId ?? null,
+              outcome: input.outcome ?? 'SUCCESS',
+              ipAddress: input.ipAddress ?? null,
+              userAgent: input.userAgent ?? null,
+              requestId: input.requestId ?? null,
+              payload: (input.payload as object | null) ?? undefined,
+              prevHash,
+              hash,
+            },
+          });
         },
-      });
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      );
     } catch (err) {
       // Audit logging must never break the request, but failures are critical.
       this.logger.error(

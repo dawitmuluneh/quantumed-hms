@@ -8,6 +8,7 @@ import {
 } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { SkipTenant } from '../../common/tenant/skip-tenant.decorator';
+import { TenantContextService } from '../../common/tenant/tenant-context.service';
 
 import { AuthService } from './auth.service';
 import { LoginDto, LoginResponseDto, RefreshDto } from './dto/login.dto';
@@ -15,7 +16,10 @@ import { LoginDto, LoginResponseDto, RefreshDto } from './dto/login.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auth: AuthService) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly tenantContext: TenantContextService,
+  ) {}
 
   @Public()
   @SkipTenant()
@@ -23,11 +27,16 @@ export class AuthController {
   @ApiOperation({ summary: 'Email + password login. Returns access and refresh tokens.' })
   @ApiResponse({ status: 200, type: LoginResponseDto })
   async login(@Body() dto: LoginDto, @Req() req: Request): Promise<LoginResponseDto> {
+    // Use the tenant context resolved by TenantMiddleware — it accepts either
+    // a hospital CUID or a slug in X-Tenant-Id, but normalises to the CUID
+    // before storing in CLS. Reading the header directly would break logins
+    // whenever the client passes a slug.
+    const resolvedHospitalId = this.tenantContext.getTenantOrNull()?.hospitalId ?? null;
     const tokens = await this.auth.login(dto.email, dto.password, dto.mfaCode, {
       ipAddress: req.ip,
       userAgent: req.headers['user-agent'] ?? null,
       requestId: (req.headers['x-request-id'] as string | undefined) ?? null,
-      hospitalId: (req.headers['x-tenant-id'] as string | undefined) ?? null,
+      hospitalId: resolvedHospitalId,
     });
     return tokens;
   }

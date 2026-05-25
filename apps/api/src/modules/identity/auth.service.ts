@@ -181,6 +181,16 @@ export class AuthService {
       where: { familyId: row.familyId, revokedAt: null },
       data: { revokedAt: new Date() },
     });
+    const user = await this.users.findById(row.userId);
+    await this.audit.write({
+      action: 'auth.logout',
+      resource: 'user',
+      resourceId: row.userId,
+      actorUserId: row.userId,
+      hospitalId: user?.hospitalId ?? null,
+      outcome: 'SUCCESS',
+      payload: { familyId: row.familyId },
+    });
   }
 
   async enableMfa(userId: string): Promise<{ secret: string; otpauth: string }> {
@@ -192,6 +202,14 @@ export class AuthService {
     await this.prisma.user.update({
       where: { id: userId },
       data: { mfaSecretEnc: enc, mfaEnabled: true },
+    });
+    await this.audit.write({
+      action: 'auth.mfa.enable',
+      resource: 'user',
+      resourceId: userId,
+      actorUserId: userId,
+      hospitalId: user.hospitalId,
+      outcome: 'SUCCESS',
     });
     const otpauth = authenticator.keyuri(user.email, 'QuantuMed HMS', secret);
     return { secret, otpauth };
