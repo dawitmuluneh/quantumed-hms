@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "QuantuMed HMS",
+    "tagline": "Cloud-native hospital management for multi-facility healthcare networks"
+  },
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "search": "Search",
+    "back": "Back",
+    "next": "Next",
+    "logout": "Log out",
+    "language": "Language",
+    "dashboard": "Dashboard"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "mfaRequired": "Two-factor authentication required",
+      "mfaCode": "Authentication code",
+      "errorInvalid": "Invalid email or password",
+      "errorLocked": "Account is temporarily locked. Please try again later."
+    }
+  },
+  "roles": {
+    "super_admin": "Super Admin",
+    "admin": "Hospital Admin",
+    "doctor": "Doctor",
+    "nurse": "Nurse",
+    "receptionist": "Receptionist",
+    "accountant": "Accountant",
+    "pharmacist": "Pharmacist",
+    "laboratorist": "Lab Staff",
+    "patient": "Patient",
+    "hr_admin": "HR Admin",
+    "radiologist": "Radiologist",
+    "donor_coordinator": "Donor Coordinator",
+    "telemedicine_provider": "Telemedicine Provider"
+  },
+  "marketing": {
+    "hero": {
+      "title": "Run your hospital with one platform.",
+      "subtitle": "EMR, scheduling, pharmacy, billing, telemedicine — built for multi-hospital networks and rural facilities.",
+      "ctaPrimary": "Request a demo",
+      "ctaSecondary": "Sign in"
+    }
+  },
+  "dashboards": {
+    "super_admin": { "title": "Super Admin Dashboard" },
+    "admin": { "title": "Hospital Admin Dashboard" },
+    "doctor": { "title": "Doctor Dashboard" },
+    "nurse": { "title": "Nurse Dashboard" },
+    "patient": { "title": "Patient Portal" },
+    "pharmacy": { "title": "Pharmacy" },
+    "lab": { "title": "Laboratory" },
+    "imaging": { "title": "Imaging" },
+    "hr": { "title": "Human Resources" },
+    "telemedicine": { "title": "Telemedicine" },
+    "donor": { "title": "Donor & Blood Bank" },
+    "referrals": { "title": "Referrals" }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "__meta": {
+    "locale": "om",
+    "dir": "ltr",
+    "status": "needs_professional_review",
+    "notes": "Best-effort translations for Phase A scaffolding. Replace with professionally reviewed medical-grade copy before production."
+  },
+  "app": {
+    "name": "QuantuMed HMS",
+    "tagline": "Sirna bulchiinsa hospitaala kan duudhaaleen yaalaa hedduu fayyadamuuf"
+  },
+  "common": {
+    "loading": "Fe’aa jira…",
+    "save": "Olkaa’i",
+    "cancel": "Haqi",
+    "submit": "Ergi",
+    "search": "Barbaadi",
+    "back": "Dhaqaba",
+    "next": "Itti aanu",
+    "logout": "Ba’i",
+    "language": "Afaan",
+    "dashboard": "Daashboordii"
+  },
+  "auth": {
+    "login": {
+      "title": "Akkaawuntii keessanitti seenaa",
+      "email": "Imeelii",
+      "password": "Jecha icciitii",
+      "submit": "Seeni",
+      "mfaRequired": "Mirkaneessuun sadarkaa lammataa barbaachisaadha",
+      "mfaCode": "Koodii mirkaneessaa",
+      "errorInvalid": "Imeeliin yookaan jechi icciitii sirrii miti",
+      "errorLocked": "Akkaawuntiin yeroof cufameera. Maaloo booda yaali."
+    }
+  },
+  "roles": {
+    "super_admin": "Bulchaa Olaanaa",
+    "admin": "Bulchaa Hospitaala",
+    "doctor": "Doktora",
+    "nurse": "Narsii",
+    "receptionist": "Simataa",
+    "accountant": "Herregaa",
+    "pharmacist": "Faarmasistii",
+    "laboratorist": "Hojjetaa Laaboraatorii",
+    "patient": "Dhukkubsataa",
+    "hr_admin": "Bulchaa HR",
+    "radiologist": "Raadiyoolojistii",
+    "donor_coordinator": "Qindeessaa Kennaa",
+    "telemedicine_provider": "Kennaa Telemeedisinii"
+  },
+  "marketing": {
+    "hero": {
+      "title": "Hospitaala keessan tajaajila tokkoon bulchaa.",
+      "subtitle": "EMR, beellama, faarmasii, kanfaltii, telemeedisinii — daldaltootaa fi tajaajiltoota baadiyyaaf.",
+      "ctaPrimary": "Agarsiisa gaafadhu",
+      "ctaSecondary": "Seeni"
+    }
+  },
+  "dashboards": {
+    "super_admin": { "title": "Daashboordii Bulchaa Olaanaa" },
+    "admin": { "title": "Daashboordii Bulchaa Hospitaala" },
+    "doctor": { "title": "Daashboordii Doktora" },
+    "nurse": { "title": "Daashboordii Narsii" },
+    "patient": { "title": "Karra Dhukkubsataa" },
+    "pharmacy": { "title": "Faarmasii" },
+    "lab": { "title": "Laaboraatorii" },
+    "imaging": { "title": "Suuraa Yaalaa" },
+    "hr": { "title": "Humna Namaa" },
+    "telemedicine": { "title": "Telemeedisinii" },
+    "donor": { "title": "Kennitootaa fi Baankii Dhiigaa" },
+    "referrals": { "title": "Riferaaloota" }
+  }
+}

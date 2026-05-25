@@ -1,0 +1,73 @@
+{
+  "__meta": {
+    "locale": "am",
+    "dir": "ltr",
+    "status": "needs_professional_review",
+    "notes": "Best-effort translations for Phase A scaffolding. Replace with professionally reviewed medical-grade copy before production."
+  },
+  "app": {
+    "name": "QuantuMed HMS",
+    "tagline": "ለብዙ-ሆስፒታል አውታር የተዘጋጀ ክላውድ-ተኮር የሆስፒታል አስተዳደር ስርዓት"
+  },
+  "common": {
+    "loading": "በመጫን ላይ…",
+    "save": "አስቀምጥ",
+    "cancel": "ሰርዝ",
+    "submit": "አስገባ",
+    "search": "ፈልግ",
+    "back": "ተመለስ",
+    "next": "ቀጣይ",
+    "logout": "ውጣ",
+    "language": "ቋንቋ",
+    "dashboard": "ዳሽቦርድ"
+  },
+  "auth": {
+    "login": {
+      "title": "ወደ መለያዎ ይግቡ",
+      "email": "ኢሜል",
+      "password": "የይለፍ ቃል",
+      "submit": "ግባ",
+      "mfaRequired": "የሁለት-ደረጃ ማረጋገጫ ያስፈልጋል",
+      "mfaCode": "የማረጋገጫ ኮድ",
+      "errorInvalid": "የተሳሳተ ኢሜል ወይም የይለፍ ቃል",
+      "errorLocked": "መለያው ለጊዜው ተቆልፏል። እባክዎ ቆይተው ይሞክሩ።"
+    }
+  },
+  "roles": {
+    "super_admin": "ዋና አስተዳዳሪ",
+    "admin": "የሆስፒታል አስተዳዳሪ",
+    "doctor": "ሐኪም",
+    "nurse": "ነርስ",
+    "receptionist": "የእንግዳ ተቀባይ",
+    "accountant": "ሒሳብ ሠራተኛ",
+    "pharmacist": "ፋርማሲስት",
+    "laboratorist": "የቤተ ሙከራ ሠራተኛ",
+    "patient": "ታካሚ",
+    "hr_admin": "የሰው ኃይል አስተዳዳሪ",
+    "radiologist": "ራዲዮሎጂስት",
+    "donor_coordinator": "የለጋሽ አስተባባሪ",
+    "telemedicine_provider": "ቴሌሜዲሲን አቅራቢ"
+  },
+  "marketing": {
+    "hero": {
+      "title": "ሆስፒታልዎን በአንድ መድረክ ያስተዳድሩ።",
+      "subtitle": "የህክምና መዝገብ፣ ቀጠሮ፣ ፋርማሲ፣ ክፍያ፣ ቴሌሜዲሲን — ለብዙ ሆስፒታሎች እና ለገጠር አገልግሎቶች።",
+      "ctaPrimary": "ማሳያ ጠይቅ",
+      "ctaSecondary": "ግባ"
+    }
+  },
+  "dashboards": {
+    "super_admin": { "title": "የዋና አስተዳዳሪ ዳሽቦርድ" },
+    "admin": { "title": "የሆስፒታል አስተዳዳሪ ዳሽቦርድ" },
+    "doctor": { "title": "የሐኪም ዳሽቦርድ" },
+    "nurse": { "title": "የነርስ ዳሽቦርድ" },
+    "patient": { "title": "የታካሚ መግቢያ" },
+    "pharmacy": { "title": "ፋርማሲ" },
+    "lab": { "title": "ላቦራቶሪ" },
+    "imaging": { "title": "ምስል ምርመራ" },
+    "hr": { "title": "የሰው ኃይል" },
+    "telemedicine": { "title": "ቴሌሜዲሲን" },
+    "donor": { "title": "ለጋሾችና የደም ባንክ" },
+    "referrals": { "title": "ሪፈራሎች" }
+  }
+}

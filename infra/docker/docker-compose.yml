@@ -1,0 +1,118 @@
+# QuantuMed HMS — local development stack (Phase A).
+#
+# Run from the repo root with:
+#   docker compose -f infra/docker/docker-compose.yml up --build
+#
+# Services exposed:
+#   - postgres   localhost:5432
+#   - redis      localhost:6379
+#   - minio      localhost:9000 (console: 9001)
+#   - maildev    localhost:1080 (SMTP: 1025)
+#   - api        localhost:4000
+#   - web        localhost:3000
+#   - worker     no exposed ports
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: quantumed
+      POSTGRES_PASSWORD: quantumed
+      POSTGRES_DB: quantumed
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U quantumed -d quantumed']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    image: minio/minio:RELEASE.2024-08-17T01-24-54Z
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: quantumed
+      MINIO_ROOT_PASSWORD: quantumed-dev
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio_data:/data
+
+  maildev:
+    image: maildev/maildev:2.1.0
+    restart: unless-stopped
+    ports:
+      - '1025:1025'
+      - '1080:1080'
+
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT_API: 4000
+      DATABASE_URL: postgresql://quantumed:quantumed@postgres:5432/quantumed?schema=platform
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: dev-access-secret-change-me
+      JWT_REFRESH_SECRET: dev-refresh-secret-change-me
+      ENCRYPTION_MASTER_KEY: ZGV2LW1hc3Rlci1lbmNyeXB0aW9uLWtleS1jaGFuZ2UtbWUtMzItYg==
+      AUDIT_HASH_PEPPER: dev-audit-pepper-change-me
+      SUPER_ADMIN_BOOTSTRAP_EMAIL: admin@quantumed.io
+      SUPER_ADMIN_BOOTSTRAP_PASSWORD: ChangeMe!OnFirstLogin
+      DEMO_HOSPITAL_SLUG: demo
+    ports:
+      - '4000:4000'
+
+  web:
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: development
+      PORT_WEB: 3000
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+    ports:
+      - '3000:3000'
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: apps/worker/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      REDIS_URL: redis://redis:6379
+      WORKER_CONCURRENCY: '4'
+
+volumes:
+  postgres_data:
+  minio_data:

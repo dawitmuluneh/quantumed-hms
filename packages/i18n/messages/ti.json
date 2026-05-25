@@ -1,0 +1,73 @@
+{
+  "__meta": {
+    "locale": "ti",
+    "dir": "ltr",
+    "status": "needs_professional_review",
+    "notes": "Best-effort translations for Phase A scaffolding. Replace with professionally reviewed medical-grade copy before production."
+  },
+  "app": {
+    "name": "QuantuMed HMS",
+    "tagline": "ናይ ብዙሕ ሆስፒታል መርበብ ዘገልግል ናይ ሆስፒታል ምሕደራ ስርዓት"
+  },
+  "common": {
+    "loading": "ይጻዓን ኣሎ…",
+    "save": "ኣቐምጥ",
+    "cancel": "ሰርዝ",
+    "submit": "ላኣኽ",
+    "search": "ድለ",
+    "back": "ተመለስ",
+    "next": "ቀጻሊ",
+    "logout": "ውጻእ",
+    "language": "ቋንቋ",
+    "dashboard": "ዳሽቦርድ"
+  },
+  "auth": {
+    "login": {
+      "title": "ናብ ሕሳብካ እተው",
+      "email": "ኢመይል",
+      "password": "ምስጢራዊ ቓል",
+      "submit": "እተው",
+      "mfaRequired": "ናይ ክልተ-ደረጃ ምርግጋጽ የድሊ",
+      "mfaCode": "መረጋገጺ ኮድ",
+      "errorInvalid": "ጌጋ ኢመይል ወይ ምስጢራዊ ቓል",
+      "errorLocked": "ሕሳብ ንግዜኡ ተዓጽዩ። ድሕሪ ቁሩብ ፈትኖ።"
+    }
+  },
+  "roles": {
+    "super_admin": "ቀንዲ ኣመሓዳሪ",
+    "admin": "ናይ ሆስፒታል ኣመሓዳሪ",
+    "doctor": "ሓኪም",
+    "nurse": "ነርስ",
+    "receptionist": "ተቐባሊ ጋሻ",
+    "accountant": "ቆጻሪ",
+    "pharmacist": "ፋርማሲስት",
+    "laboratorist": "ናይ ላቦራቶሪ ሰራሕተኛ",
+    "patient": "ሕሙም",
+    "hr_admin": "ናይ ሰብ ሓይሊ ኣመሓዳሪ",
+    "radiologist": "ራዲዮሎጂስት",
+    "donor_coordinator": "ናይ ሃገራዊ ኣወሃሃዲ",
+    "telemedicine_provider": "ናይ ቴሌመዲሲን ኣገልጋሊ"
+  },
+  "marketing": {
+    "hero": {
+      "title": "ሆስፒታልካ ብሓደ መድረኽ ኣመሓድር።",
+      "subtitle": "EMR፣ ቆጸራ፣ ፋርማሲ፣ ክፍሊት፣ ቴሌመዲሲን — ንብዙሓት ሆስፒታላትን ናይ ገጠር ኣገልግሎታትን።",
+      "ctaPrimary": "ምርኢት ሕተት",
+      "ctaSecondary": "እተው"
+    }
+  },
+  "dashboards": {
+    "super_admin": { "title": "ናይ ቀንዲ ኣመሓዳሪ ዳሽቦርድ" },
+    "admin": { "title": "ናይ ሆስፒታል ኣመሓዳሪ ዳሽቦርድ" },
+    "doctor": { "title": "ናይ ሓኪም ዳሽቦርድ" },
+    "nurse": { "title": "ናይ ነርስ ዳሽቦርድ" },
+    "patient": { "title": "ናይ ሕሙም መእተዊ" },
+    "pharmacy": { "title": "ፋርማሲ" },
+    "lab": { "title": "ላቦራቶሪ" },
+    "imaging": { "title": "ስእሊ ምርመራ" },
+    "hr": { "title": "ሰብ ሓይሊ" },
+    "telemedicine": { "title": "ቴሌመዲሲን" },
+    "donor": { "title": "ለገስቲ ደምን ናይ ደም ባንክን" },
+    "referrals": { "title": "ሪፈራላት" }
+  }
+}

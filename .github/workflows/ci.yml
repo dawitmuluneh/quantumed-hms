@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  TURBO_TELEMETRY_DISABLED: '1'
+  PNPM_VERSION: '9.15.1'
+  NODE_VERSION: '20'
+
+jobs:
+  lint-typecheck-test:
+    name: Lint, type-check, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: quantumed
+          POSTGRES_PASSWORD: quantumed
+          POSTGRES_DB: quantumed
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U quantumed -d quantumed"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://quantumed:quantumed@localhost:5432/quantumed?schema=platform
+      REDIS_URL: redis://localhost:6379
+      JWT_ACCESS_SECRET: ci-access-secret
+      JWT_REFRESH_SECRET: ci-refresh-secret
+      ENCRYPTION_MASTER_KEY: Y2ktbWFzdGVyLWVuY3J5cHRpb24ta2V5LTMyLWJ5dGVzLWxvbmctZW51Zw==
+      AUDIT_HASH_PEPPER: ci-audit-pepper
+      SUPER_ADMIN_BOOTSTRAP_EMAIL: admin@quantumed.io
+      SUPER_ADMIN_BOOTSTRAP_PASSWORD: CiBootstrap!1
+      DEMO_HOSPITAL_SLUG: demo
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Prisma generate
+        run: pnpm --filter @quantumed/api prisma:generate
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type-check
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test:unit
+
+      - name: Build
+        run: pnpm build

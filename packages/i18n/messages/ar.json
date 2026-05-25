@@ -1,0 +1,73 @@
+{
+  "__meta": {
+    "locale": "ar",
+    "dir": "rtl",
+    "status": "needs_professional_review",
+    "notes": "Best-effort translations for Phase A scaffolding. Replace with professionally reviewed medical-grade copy before production."
+  },
+  "app": {
+    "name": "QuantuMed HMS",
+    "tagline": "نظام إدارة مستشفيات سحابي للشبكات متعددة المرافق"
+  },
+  "common": {
+    "loading": "جارٍ التحميل…",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "submit": "إرسال",
+    "search": "بحث",
+    "back": "رجوع",
+    "next": "التالي",
+    "logout": "تسجيل الخروج",
+    "language": "اللغة",
+    "dashboard": "لوحة التحكم"
+  },
+  "auth": {
+    "login": {
+      "title": "تسجيل الدخول إلى حسابك",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "submit": "تسجيل الدخول",
+      "mfaRequired": "المصادقة الثنائية مطلوبة",
+      "mfaCode": "رمز المصادقة",
+      "errorInvalid": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+      "errorLocked": "الحساب مقفل مؤقتًا. يرجى المحاولة لاحقًا."
+    }
+  },
+  "roles": {
+    "super_admin": "مدير عام",
+    "admin": "مدير المستشفى",
+    "doctor": "طبيب",
+    "nurse": "ممرض/ة",
+    "receptionist": "موظف استقبال",
+    "accountant": "محاسب",
+    "pharmacist": "صيدلي",
+    "laboratorist": "موظف مختبر",
+    "patient": "مريض",
+    "hr_admin": "مدير الموارد البشرية",
+    "radiologist": "أخصائي أشعة",
+    "donor_coordinator": "منسق المتبرعين",
+    "telemedicine_provider": "مقدم الرعاية عن بُعد"
+  },
+  "marketing": {
+    "hero": {
+      "title": "أدِر مستشفاك من منصة واحدة.",
+      "subtitle": "السجلات الطبية والمواعيد والصيدلية والفوترة والطب عن بُعد — لشبكات المستشفيات والمرافق الريفية.",
+      "ctaPrimary": "اطلب عرضًا توضيحيًا",
+      "ctaSecondary": "تسجيل الدخول"
+    }
+  },
+  "dashboards": {
+    "super_admin": { "title": "لوحة تحكم المدير العام" },
+    "admin": { "title": "لوحة تحكم مدير المستشفى" },
+    "doctor": { "title": "لوحة الطبيب" },
+    "nurse": { "title": "لوحة الممرض" },
+    "patient": { "title": "بوابة المريض" },
+    "pharmacy": { "title": "الصيدلية" },
+    "lab": { "title": "المختبر" },
+    "imaging": { "title": "التصوير الطبي" },
+    "hr": { "title": "الموارد البشرية" },
+    "telemedicine": { "title": "الطب عن بُعد" },
+    "donor": { "title": "المتبرعون وبنك الدم" },
+    "referrals": { "title": "الإحالات" }
+  }
+}

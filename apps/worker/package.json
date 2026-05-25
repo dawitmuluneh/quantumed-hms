@@ -1,0 +1,32 @@
+{
+  "name": "@quantumed/worker",
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
+    "start": "node dist/main.js",
+    "lint": "eslint \"src/**/*.ts\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo 'worker unit tests will land with Phase B' && exit 0",
+    "test:unit": "echo 'worker unit tests will land with Phase B' && exit 0",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@quantumed/shared-types": "workspace:*",
+    "bullmq": "^5.8.0",
+    "ioredis": "^5.4.1",
+    "pino": "^9.2.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@quantumed/config-eslint": "workspace:*",
+    "@quantumed/config-typescript": "workspace:*",
+    "@types/node": "^20.12.7",
+    "eslint": "^8.57.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
+  }
+}

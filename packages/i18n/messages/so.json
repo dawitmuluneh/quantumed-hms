@@ -1,0 +1,73 @@
+{
+  "__meta": {
+    "locale": "so",
+    "dir": "ltr",
+    "status": "needs_professional_review",
+    "notes": "Best-effort translations for Phase A scaffolding. Replace with professionally reviewed medical-grade copy before production."
+  },
+  "app": {
+    "name": "QuantuMed HMS",
+    "tagline": "Nidaamka maaraynta isbitaalada oo loogu talagalay shabakado badan oo daryeel caafimaad"
+  },
+  "common": {
+    "loading": "Waa la rarayaa…",
+    "save": "Kaydi",
+    "cancel": "Joojin",
+    "submit": "Dir",
+    "search": "Raadi",
+    "back": "Dib u noqo",
+    "next": "Xiga",
+    "logout": "Ka bax",
+    "language": "Luqad",
+    "dashboard": "Dashboard"
+  },
+  "auth": {
+    "login": {
+      "title": "Gal akoonkaaga",
+      "email": "Iimaylka",
+      "password": "Erayga sirta ah",
+      "submit": "Gal",
+      "mfaRequired": "Xaqiijinta laba-marka ah ayaa loo baahan yahay",
+      "mfaCode": "Lambarka xaqiijinta",
+      "errorInvalid": "Iimaylka ama erayga sirta ah waa khalad",
+      "errorLocked": "Akoonku waxaa la xidhay si ku meel gaadh ah. Fadlan dib u isku day."
+    }
+  },
+  "roles": {
+    "super_admin": "Maamulaha Sare",
+    "admin": "Maamulaha Isbitaalka",
+    "doctor": "Dhakhtar",
+    "nurse": "Kalkaaliye",
+    "receptionist": "Soo-dhaweeye",
+    "accountant": "Xisaabiye",
+    "pharmacist": "Farmashiiste",
+    "laboratorist": "Shaqaalaha Sheybaarka",
+    "patient": "Bukaan",
+    "hr_admin": "Maamulaha Shaqaalaha",
+    "radiologist": "Raadiyoolajiiste",
+    "donor_coordinator": "Iskuduwaha Deeqaha",
+    "telemedicine_provider": "Bixiyaha Telemedicine"
+  },
+  "marketing": {
+    "hero": {
+      "title": "Isbitaalkaaga ku maamul hal madal.",
+      "subtitle": "Diiwaanka caafimaadka, ballamaha, farmashida, biilasha, telemedicine — shabakado isbitaalo oo badan iyo xarumo miyi ah.",
+      "ctaPrimary": "Codso bandhig",
+      "ctaSecondary": "Gal"
+    }
+  },
+  "dashboards": {
+    "super_admin": { "title": "Dashboard-ka Maamulaha Sare" },
+    "admin": { "title": "Dashboard-ka Maamulaha Isbitaalka" },
+    "doctor": { "title": "Dashboard-ka Dhakhtarka" },
+    "nurse": { "title": "Dashboard-ka Kalkaaliyaha" },
+    "patient": { "title": "Boggii Bukaanka" },
+    "pharmacy": { "title": "Farmashi" },
+    "lab": { "title": "Sheybaar" },
+    "imaging": { "title": "Sawiridda Caafimaadka" },
+    "hr": { "title": "Maaraynta Shaqaalaha" },
+    "telemedicine": { "title": "Telemedicine" },
+    "donor": { "title": "Deeq-bixiyayaal & Bangiga Dhiigga" },
+    "referrals": { "title": "Gudbinta" }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@quantumed/config-typescript",
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "files": [
+    "base.json",
+    "node.json",
+    "nextjs.json"
+  ]
+}
