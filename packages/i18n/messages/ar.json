@@ -30,7 +30,8 @@
       "mfaRequired": "المصادقة الثنائية مطلوبة",
       "mfaCode": "رمز المصادقة",
       "errorInvalid": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
-      "errorLocked": "الحساب مقفل مؤقتًا. يرجى المحاولة لاحقًا."
+      "errorLocked": "الحساب مقفل مؤقتًا. يرجى المحاولة لاحقًا.",
+      "hospitalSlug": "المستشفى"
     }
   },
   "roles": {
@@ -57,17 +58,72 @@
     }
   },
   "dashboards": {
-    "super_admin": { "title": "لوحة تحكم المدير العام" },
-    "admin": { "title": "لوحة تحكم مدير المستشفى" },
-    "doctor": { "title": "لوحة الطبيب" },
-    "nurse": { "title": "لوحة الممرض" },
-    "patient": { "title": "بوابة المريض" },
-    "pharmacy": { "title": "الصيدلية" },
-    "lab": { "title": "المختبر" },
-    "imaging": { "title": "التصوير الطبي" },
-    "hr": { "title": "الموارد البشرية" },
-    "telemedicine": { "title": "الطب عن بُعد" },
-    "donor": { "title": "المتبرعون وبنك الدم" },
-    "referrals": { "title": "الإحالات" }
+    "super_admin": {
+      "title": "لوحة تحكم المدير العام"
+    },
+    "admin": {
+      "title": "لوحة تحكم مدير المستشفى"
+    },
+    "doctor": {
+      "title": "لوحة الطبيب",
+      "patients": {
+        "title": "المرضى",
+        "register": "تسجيل مريض",
+        "mrn": "رقم السجل",
+        "name": "الاسم",
+        "dob": "تاريخ الميلاد",
+        "sex": "الجنس",
+        "status": "الحالة",
+        "phone": "الهاتف",
+        "email": "البريد الإلكتروني",
+        "noPatients": "لا يوجد مرضى. سجّل أول مريض.",
+        "firstName": "الاسم الأول",
+        "lastName": "اسم العائلة",
+        "submit": "تسجيل",
+        "cancel": "إلغاء"
+      },
+      "appointments": {
+        "title": "المواعيد",
+        "scheduledStart": "البداية",
+        "scheduledEnd": "النهاية",
+        "patient": "المريض",
+        "provider": "مقدم الخدمة",
+        "status": "الحالة",
+        "reason": "السبب",
+        "noAppointments": "لا توجد مواعيد مجدولة.",
+        "book": "حجز موعد",
+        "patientId": "معرّف المريض",
+        "providerUserId": "معرّف مقدم الخدمة",
+        "submit": "حجز",
+        "cancel": "إلغاء"
+      }
+    },
+    "nurse": {
+      "title": "لوحة الممرض"
+    },
+    "patient": {
+      "title": "بوابة المريض"
+    },
+    "pharmacy": {
+      "title": "الصيدلية"
+    },
+    "lab": {
+      "title": "المختبر"
+    },
+    "imaging": {
+      "title": "التصوير الطبي"
+    },
+    "hr": {
+      "title": "الموارد البشرية"
+    },
+    "telemedicine": {
+      "title": "الطب عن بُعد"
+    },
+    "donor": {
+      "title": "المتبرعون وبنك الدم"
+    },
+    "referrals": {
+      "title": "الإحالات"
+    }
   }
 }

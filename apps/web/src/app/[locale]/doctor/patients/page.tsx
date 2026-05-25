@@ -1,6 +1,5 @@
-import { ModuleStub } from '@/components/module-stub';
+import { PatientsDashboard } from '@/components/patients-dashboard';
 
-export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  return <ModuleStub i18nKey="doctor" routePath="/doctor/patients" locale={locale} phase="C" />;
+export default function Page() {
+  return <PatientsDashboard />;
 }

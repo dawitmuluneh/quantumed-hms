@@ -30,7 +30,8 @@
       "mfaRequired": "Xaqiijinta laba-marka ah ayaa loo baahan yahay",
       "mfaCode": "Lambarka xaqiijinta",
       "errorInvalid": "Iimaylka ama erayga sirta ah waa khalad",
-      "errorLocked": "Akoonku waxaa la xidhay si ku meel gaadh ah. Fadlan dib u isku day."
+      "errorLocked": "Akoonku waxaa la xidhay si ku meel gaadh ah. Fadlan dib u isku day.",
+      "hospitalSlug": "Cusbitaalka"
     }
   },
   "roles": {
@@ -57,17 +58,72 @@
     }
   },
   "dashboards": {
-    "super_admin": { "title": "Dashboard-ka Maamulaha Sare" },
-    "admin": { "title": "Dashboard-ka Maamulaha Isbitaalka" },
-    "doctor": { "title": "Dashboard-ka Dhakhtarka" },
-    "nurse": { "title": "Dashboard-ka Kalkaaliyaha" },
-    "patient": { "title": "Boggii Bukaanka" },
-    "pharmacy": { "title": "Farmashi" },
-    "lab": { "title": "Sheybaar" },
-    "imaging": { "title": "Sawiridda Caafimaadka" },
-    "hr": { "title": "Maaraynta Shaqaalaha" },
-    "telemedicine": { "title": "Telemedicine" },
-    "donor": { "title": "Deeq-bixiyayaal & Bangiga Dhiigga" },
-    "referrals": { "title": "Gudbinta" }
+    "super_admin": {
+      "title": "Dashboard-ka Maamulaha Sare"
+    },
+    "admin": {
+      "title": "Dashboard-ka Maamulaha Isbitaalka"
+    },
+    "doctor": {
+      "title": "Dashboard-ka Dhakhtarka",
+      "patients": {
+        "title": "Bukaannada",
+        "register": "Diiwaangeli bukaan",
+        "mrn": "MRN",
+        "name": "Magaca",
+        "dob": "Taariikhda dhalashada",
+        "sex": "Jinsiga",
+        "status": "Xaaladda",
+        "phone": "Telefoon",
+        "email": "Iimayl",
+        "noPatients": "Bukaan ma jiro.",
+        "firstName": "Magaca",
+        "lastName": "Magaca aabbe",
+        "submit": "Diiwaangeli",
+        "cancel": "Tirtir"
+      },
+      "appointments": {
+        "title": "Ballamada",
+        "scheduledStart": "Bilow",
+        "scheduledEnd": "Dhamaad",
+        "patient": "Bukaan",
+        "provider": "Bixiye",
+        "status": "Xaaladda",
+        "reason": "Sababta",
+        "noAppointments": "Ballan ma jiro.",
+        "book": "Qabso ballan",
+        "patientId": "ID-da bukaanka",
+        "providerUserId": "ID-da bixiyaha",
+        "submit": "Qabso",
+        "cancel": "Tirtir"
+      }
+    },
+    "nurse": {
+      "title": "Dashboard-ka Kalkaaliyaha"
+    },
+    "patient": {
+      "title": "Boggii Bukaanka"
+    },
+    "pharmacy": {
+      "title": "Farmashi"
+    },
+    "lab": {
+      "title": "Sheybaar"
+    },
+    "imaging": {
+      "title": "Sawiridda Caafimaadka"
+    },
+    "hr": {
+      "title": "Maaraynta Shaqaalaha"
+    },
+    "telemedicine": {
+      "title": "Telemedicine"
+    },
+    "donor": {
+      "title": "Deeq-bixiyayaal & Bangiga Dhiigga"
+    },
+    "referrals": {
+      "title": "Gudbinta"
+    }
   }
 }

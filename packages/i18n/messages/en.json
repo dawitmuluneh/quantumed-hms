@@ -24,7 +24,8 @@
       "mfaRequired": "Two-factor authentication required",
       "mfaCode": "Authentication code",
       "errorInvalid": "Invalid email or password",
-      "errorLocked": "Account is temporarily locked. Please try again later."
+      "errorLocked": "Account is temporarily locked. Please try again later.",
+      "hospitalSlug": "Hospital"
     }
   },
   "roles": {
@@ -51,17 +52,72 @@
     }
   },
   "dashboards": {
-    "super_admin": { "title": "Super Admin Dashboard" },
-    "admin": { "title": "Hospital Admin Dashboard" },
-    "doctor": { "title": "Doctor Dashboard" },
-    "nurse": { "title": "Nurse Dashboard" },
-    "patient": { "title": "Patient Portal" },
-    "pharmacy": { "title": "Pharmacy" },
-    "lab": { "title": "Laboratory" },
-    "imaging": { "title": "Imaging" },
-    "hr": { "title": "Human Resources" },
-    "telemedicine": { "title": "Telemedicine" },
-    "donor": { "title": "Donor & Blood Bank" },
-    "referrals": { "title": "Referrals" }
+    "super_admin": {
+      "title": "Super Admin Dashboard"
+    },
+    "admin": {
+      "title": "Hospital Admin Dashboard"
+    },
+    "doctor": {
+      "title": "Doctor Dashboard",
+      "patients": {
+        "title": "Patients",
+        "register": "Register patient",
+        "mrn": "MRN",
+        "name": "Name",
+        "dob": "DOB",
+        "sex": "Sex",
+        "status": "Status",
+        "phone": "Phone",
+        "email": "Email",
+        "noPatients": "No patients yet. Register the first one.",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "submit": "Register",
+        "cancel": "Cancel"
+      },
+      "appointments": {
+        "title": "Appointments",
+        "scheduledStart": "Start",
+        "scheduledEnd": "End",
+        "patient": "Patient",
+        "provider": "Provider",
+        "status": "Status",
+        "reason": "Reason",
+        "noAppointments": "No appointments scheduled.",
+        "book": "Book appointment",
+        "patientId": "Patient ID",
+        "providerUserId": "Provider user ID",
+        "submit": "Book",
+        "cancel": "Cancel"
+      }
+    },
+    "nurse": {
+      "title": "Nurse Dashboard"
+    },
+    "patient": {
+      "title": "Patient Portal"
+    },
+    "pharmacy": {
+      "title": "Pharmacy"
+    },
+    "lab": {
+      "title": "Laboratory"
+    },
+    "imaging": {
+      "title": "Imaging"
+    },
+    "hr": {
+      "title": "Human Resources"
+    },
+    "telemedicine": {
+      "title": "Telemedicine"
+    },
+    "donor": {
+      "title": "Donor & Blood Bank"
+    },
+    "referrals": {
+      "title": "Referrals"
+    }
   }
 }

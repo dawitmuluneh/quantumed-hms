@@ -3,6 +3,8 @@
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
+import { API_BASE, writeSession } from '@/lib/api-client';
+
 interface Props {
   locale: string;
 }
@@ -13,13 +15,12 @@ interface LoginResponse {
   user: { id: string; email: string; fullName: string; roles: string[] };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000';
-
 export function LoginForm({ locale: _locale }: Props) {
   const t = useTranslations();
   const [email, setEmail] = useState('doctor@demo.com');
   const [password, setPassword] = useState('demo123');
   const [mfaCode, setMfaCode] = useState('');
+  const [hospitalSlug, setHospitalSlug] = useState('demo');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<LoginResponse | null>(null);
@@ -32,7 +33,10 @@ export function LoginForm({ locale: _locale }: Props) {
     try {
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(hospitalSlug ? { 'X-Tenant-Id': hospitalSlug } : {}),
+        },
         body: JSON.stringify({ email, password, mfaCode: mfaCode || undefined }),
       });
       if (!res.ok) {
@@ -43,6 +47,12 @@ export function LoginForm({ locale: _locale }: Props) {
         return;
       }
       const data = (await res.json()) as LoginResponse;
+      writeSession({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        hospitalSlug,
+        user: data.user,
+      });
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Network error');
@@ -65,6 +75,16 @@ export function LoginForm({ locale: _locale }: Props) {
 
   return (
     <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+      <div>
+        <label className="text-sm text-slate-700">{t('auth.login.hospitalSlug')}</label>
+        <input
+          type="text"
+          autoComplete="organization"
+          value={hospitalSlug}
+          onChange={(e) => setHospitalSlug(e.target.value)}
+          className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+        />
+      </div>
       <div>
         <label className="text-sm text-slate-700">{t('auth.login.email')}</label>
         <input

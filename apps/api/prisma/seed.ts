@@ -11,8 +11,13 @@
  * Run with: `pnpm --filter @quantumed/api db:seed`
  */
 
-import { PrismaClient } from '@prisma/client';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { Prisma, PrismaClient } from '@prisma/client';
 import * as argon2 from 'argon2';
+
+import { splitStatements } from '../src/modules/tenancy/tenant-provisioning.service';
 
 const prisma = new PrismaClient();
 
@@ -95,13 +100,13 @@ async function ensureRoles() {
   console.log(`[seed] ${ROLES.length} roles ensured`);
 }
 
-async function ensureDemoHospital(): Promise<{ id: string }> {
+async function ensureDemoHospital(): Promise<{ id: string; schemaName: string }> {
   const slug = process.env.DEMO_HOSPITAL_SLUG ?? 'demo';
   const schemaName = `tenant_${slug}`;
   const existing = await prisma.hospital.findUnique({ where: { slug } });
   if (existing) {
     console.log(`[seed] demo hospital ${slug} already present (${existing.id})`);
-    return { id: existing.id };
+    return { id: existing.id, schemaName };
   }
   const created = await prisma.hospital.create({
     data: {
@@ -118,7 +123,32 @@ async function ensureDemoHospital(): Promise<{ id: string }> {
     },
   });
   console.log(`[seed] demo hospital created (${created.id})`);
-  return { id: created.id };
+  return { id: created.id, schemaName };
+}
+
+/**
+ * Provisions the tenant schema and applies the Phase B.1 clinical DDL. Safe
+ * to run repeatedly — the template uses `IF NOT EXISTS` for every object.
+ */
+async function provisionTenantSchema(schemaName: string): Promise<void> {
+  if (!/^tenant_[a-z0-9_]{1,48}$/.test(schemaName)) {
+    throw new Error(`Refusing to provision invalid schema name: ${schemaName}`);
+  }
+  await prisma.$executeRawUnsafe('CREATE EXTENSION IF NOT EXISTS btree_gist');
+  const ident = Prisma.raw(`"${schemaName}"`);
+  await prisma.$executeRaw`CREATE SCHEMA IF NOT EXISTS ${ident}`;
+  await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS ${ident}.tenant_meta (
+    id BIGSERIAL PRIMARY KEY,
+    provisioned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    schema_version INTEGER NOT NULL DEFAULT 1
+  )`;
+  const templatePath = join(__dirname, 'tenant-template.sql');
+  const template = readFileSync(templatePath, 'utf8');
+  const rendered = template.replaceAll('{{schema}}', `"${schemaName}"`);
+  for (const stmt of splitStatements(rendered)) {
+    await prisma.$executeRawUnsafe(stmt);
+  }
+  console.log(`[seed] tenant schema ${schemaName} provisioned (Phase B.1 DDL applied)`);
 }
 
 async function ensureUser(opts: {
@@ -191,7 +221,8 @@ async function main(): Promise<void> {
   });
   console.log(`[seed] super admin ensured (${superEmail}) — must rotate on first login`);
 
-  const { id: demoHospitalId } = await ensureDemoHospital();
+  const { id: demoHospitalId, schemaName: demoSchema } = await ensureDemoHospital();
+  await provisionTenantSchema(demoSchema);
 
   const demoHash = await hashPassword('demo123');
   for (const u of DEMO_USERS) {

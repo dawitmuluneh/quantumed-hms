@@ -30,7 +30,8 @@
       "mfaRequired": "Mirkaneessuun sadarkaa lammataa barbaachisaadha",
       "mfaCode": "Koodii mirkaneessaa",
       "errorInvalid": "Imeeliin yookaan jechi icciitii sirrii miti",
-      "errorLocked": "Akkaawuntiin yeroof cufameera. Maaloo booda yaali."
+      "errorLocked": "Akkaawuntiin yeroof cufameera. Maaloo booda yaali.",
+      "hospitalSlug": "Hospitaala"
     }
   },
   "roles": {
@@ -57,17 +58,72 @@
     }
   },
   "dashboards": {
-    "super_admin": { "title": "Daashboordii Bulchaa Olaanaa" },
-    "admin": { "title": "Daashboordii Bulchaa Hospitaala" },
-    "doctor": { "title": "Daashboordii Doktora" },
-    "nurse": { "title": "Daashboordii Narsii" },
-    "patient": { "title": "Karra Dhukkubsataa" },
-    "pharmacy": { "title": "Faarmasii" },
-    "lab": { "title": "Laaboraatorii" },
-    "imaging": { "title": "Suuraa Yaalaa" },
-    "hr": { "title": "Humna Namaa" },
-    "telemedicine": { "title": "Telemeedisinii" },
-    "donor": { "title": "Kennitootaa fi Baankii Dhiigaa" },
-    "referrals": { "title": "Riferaaloota" }
+    "super_admin": {
+      "title": "Daashboordii Bulchaa Olaanaa"
+    },
+    "admin": {
+      "title": "Daashboordii Bulchaa Hospitaala"
+    },
+    "doctor": {
+      "title": "Daashboordii Doktora",
+      "patients": {
+        "title": "Dhukkubsattoota",
+        "register": "Dhukkubsataa galmeessi",
+        "mrn": "MRN",
+        "name": "Maqaa",
+        "dob": "Guyyaa dhalootaa",
+        "sex": "Saala",
+        "status": "Haala",
+        "phone": "Bilbila",
+        "email": "Imeelii",
+        "noPatients": "Dhukkubsataan hin jiru.",
+        "firstName": "Maqaa",
+        "lastName": "Maqaa abbaa",
+        "submit": "Galmeessi",
+        "cancel": "Haqi"
+      },
+      "appointments": {
+        "title": "Beellama",
+        "scheduledStart": "Jalqaba",
+        "scheduledEnd": "Xumura",
+        "patient": "Dhukkubsataa",
+        "provider": "Kennaa",
+        "status": "Haala",
+        "reason": "Sababa",
+        "noAppointments": "Beellamni hin jiru.",
+        "book": "Beellama qabachuu",
+        "patientId": "Lakkoofsa dhukkubsataa",
+        "providerUserId": "Lakkoofsa kennituu",
+        "submit": "Qabaadhu",
+        "cancel": "Haqi"
+      }
+    },
+    "nurse": {
+      "title": "Daashboordii Narsii"
+    },
+    "patient": {
+      "title": "Karra Dhukkubsataa"
+    },
+    "pharmacy": {
+      "title": "Faarmasii"
+    },
+    "lab": {
+      "title": "Laaboraatorii"
+    },
+    "imaging": {
+      "title": "Suuraa Yaalaa"
+    },
+    "hr": {
+      "title": "Humna Namaa"
+    },
+    "telemedicine": {
+      "title": "Telemeedisinii"
+    },
+    "donor": {
+      "title": "Kennitootaa fi Baankii Dhiigaa"
+    },
+    "referrals": {
+      "title": "Riferaaloota"
+    }
   }
 }

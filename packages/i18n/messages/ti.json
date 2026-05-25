@@ -30,7 +30,8 @@
       "mfaRequired": "ናይ ክልተ-ደረጃ ምርግጋጽ የድሊ",
       "mfaCode": "መረጋገጺ ኮድ",
       "errorInvalid": "ጌጋ ኢመይል ወይ ምስጢራዊ ቓል",
-      "errorLocked": "ሕሳብ ንግዜኡ ተዓጽዩ። ድሕሪ ቁሩብ ፈትኖ።"
+      "errorLocked": "ሕሳብ ንግዜኡ ተዓጽዩ። ድሕሪ ቁሩብ ፈትኖ።",
+      "hospitalSlug": "ሆስፒታል"
     }
   },
   "roles": {
@@ -57,17 +58,72 @@
     }
   },
   "dashboards": {
-    "super_admin": { "title": "ናይ ቀንዲ ኣመሓዳሪ ዳሽቦርድ" },
-    "admin": { "title": "ናይ ሆስፒታል ኣመሓዳሪ ዳሽቦርድ" },
-    "doctor": { "title": "ናይ ሓኪም ዳሽቦርድ" },
-    "nurse": { "title": "ናይ ነርስ ዳሽቦርድ" },
-    "patient": { "title": "ናይ ሕሙም መእተዊ" },
-    "pharmacy": { "title": "ፋርማሲ" },
-    "lab": { "title": "ላቦራቶሪ" },
-    "imaging": { "title": "ስእሊ ምርመራ" },
-    "hr": { "title": "ሰብ ሓይሊ" },
-    "telemedicine": { "title": "ቴሌመዲሲን" },
-    "donor": { "title": "ለገስቲ ደምን ናይ ደም ባንክን" },
-    "referrals": { "title": "ሪፈራላት" }
+    "super_admin": {
+      "title": "ናይ ቀንዲ ኣመሓዳሪ ዳሽቦርድ"
+    },
+    "admin": {
+      "title": "ናይ ሆስፒታል ኣመሓዳሪ ዳሽቦርድ"
+    },
+    "doctor": {
+      "title": "ናይ ሓኪም ዳሽቦርድ",
+      "patients": {
+        "title": "ሕሙማን",
+        "register": "ሕሙም መዝግብ",
+        "mrn": "MRN",
+        "name": "ስም",
+        "dob": "ዕለተ-ልደት",
+        "sex": "ጾታ",
+        "status": "ኩነታት",
+        "phone": "ቴሌፎን",
+        "email": "ኢመይል",
+        "noPatients": "ዝኾነ ሕሙም የለን።",
+        "firstName": "ቀዳማይ ስም",
+        "lastName": "ስም ኣቦ",
+        "submit": "መዝግብ",
+        "cancel": "ኣጥፍእ"
+      },
+      "appointments": {
+        "title": "ቆፀራታት",
+        "scheduledStart": "መጀመር",
+        "scheduledEnd": "መወዳእታ",
+        "patient": "ሕሙም",
+        "provider": "ኣገልጋሊ",
+        "status": "ኩነታት",
+        "reason": "ምኽንያት",
+        "noAppointments": "ቆጸራ የለን።",
+        "book": "ቆጸራ ሓዝ",
+        "patientId": "መለለዪ ሕሙም",
+        "providerUserId": "መለለዪ ኣገልጋሊ",
+        "submit": "ሓዝ",
+        "cancel": "ኣጥፍእ"
+      }
+    },
+    "nurse": {
+      "title": "ናይ ነርስ ዳሽቦርድ"
+    },
+    "patient": {
+      "title": "ናይ ሕሙም መእተዊ"
+    },
+    "pharmacy": {
+      "title": "ፋርማሲ"
+    },
+    "lab": {
+      "title": "ላቦራቶሪ"
+    },
+    "imaging": {
+      "title": "ስእሊ ምርመራ"
+    },
+    "hr": {
+      "title": "ሰብ ሓይሊ"
+    },
+    "telemedicine": {
+      "title": "ቴሌመዲሲን"
+    },
+    "donor": {
+      "title": "ለገስቲ ደምን ናይ ደም ባንክን"
+    },
+    "referrals": {
+      "title": "ሪፈራላት"
+    }
   }
 }

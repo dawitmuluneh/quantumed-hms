@@ -1,6 +1,5 @@
-import { ModuleStub } from '@/components/module-stub';
+import { AppointmentsDashboard } from '@/components/appointments-dashboard';
 
-export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  return <ModuleStub i18nKey="doctor" routePath="/doctor/appointments" locale={locale} phase="C" />;
+export default function Page() {
+  return <AppointmentsDashboard />;
 }

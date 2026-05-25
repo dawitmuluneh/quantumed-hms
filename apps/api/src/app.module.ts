@@ -11,8 +11,11 @@ import { PrismaModule } from './common/prisma/prisma.module';
 import { RbacModule } from './common/rbac/rbac.module';
 import { TenantModule } from './common/tenant/tenant.module';
 import { HealthController } from './health/health.controller';
+import { EncountersModule } from './modules/encounters/encounters.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { MultiHospitalModule } from './modules/multi-hospital/multi-hospital.module';
+import { PatientsModule } from './modules/patients/patients.module';
+import { SchedulingModule } from './modules/scheduling/scheduling.module';
 import { TenancyModule } from './modules/tenancy/tenancy.module';
 
 @Module({
@@ -35,6 +38,9 @@ import { TenancyModule } from './modules/tenancy/tenancy.module';
     IdentityModule,
     TenancyModule,
     MultiHospitalModule,
+    PatientsModule,
+    EncountersModule,
+    SchedulingModule,
   ],
   controllers: [HealthController],
 })
