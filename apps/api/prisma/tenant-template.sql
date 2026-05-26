@@ -396,3 +396,232 @@ CREATE INDEX IF NOT EXISTS pharmacy_dispenses_batch_idx
   ON {{schema}}.pharmacy_dispenses (batch_id);
 CREATE INDEX IF NOT EXISTS pharmacy_dispenses_dispensed_at_idx
   ON {{schema}}.pharmacy_dispenses (dispensed_at DESC);
+
+-- =============================================================================
+-- PHASE B.3 — LABORATORY (orders, results, multi-level verification)
+-- =============================================================================
+
+-- =============================================================================
+-- lab_tests — per-tenant catalog of orderable tests. Reference and critical
+-- ranges are stored as text to allow non-numeric units (e.g. "POS/NEG") even
+-- though the numeric path is the common one. The numeric thresholds are
+-- snapshotted onto lab_results so historical flags do not change when the
+-- catalog is later edited.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.lab_tests (
+  id                  UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  code                TEXT         NOT NULL UNIQUE,
+  name                TEXT         NOT NULL,
+  specimen_type       TEXT         NOT NULL
+                        CHECK (specimen_type IN (
+                          'BLOOD', 'SERUM', 'PLASMA', 'URINE', 'STOOL',
+                          'SPUTUM', 'CSF', 'SWAB', 'TISSUE', 'OTHER'
+                        )),
+  unit                TEXT,
+  reference_low       NUMERIC(14,4),
+  reference_high      NUMERIC(14,4),
+  critical_low        NUMERIC(14,4),
+  critical_high       NUMERIC(14,4),
+  turnaround_minutes  INTEGER      CHECK (turnaround_minutes IS NULL OR turnaround_minutes > 0),
+  is_active           BOOLEAN      NOT NULL DEFAULT TRUE,
+  created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS lab_tests_active_idx
+  ON {{schema}}.lab_tests (is_active);
+
+-- =============================================================================
+-- lab_orders — header. Each order belongs to one encounter and carries a
+-- unique sample_barcode that pharmacy/lab staff scan. `priority` follows the
+-- standard 4-tier triage scheme. PHI notes are encrypted at rest.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.lab_orders (
+  id                  UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  encounter_id        UUID         NOT NULL
+                        REFERENCES {{schema}}.encounters (id) ON DELETE RESTRICT,
+  patient_id          UUID         NOT NULL
+                        REFERENCES {{schema}}.patients (id) ON DELETE RESTRICT,
+  ordered_by_user_id  TEXT         NOT NULL,
+  priority            TEXT         NOT NULL DEFAULT 'ROUTINE'
+                        CHECK (priority IN ('ROUTINE', 'URGENT', 'STAT', 'EMERGENCY')),
+  status              TEXT         NOT NULL DEFAULT 'PENDING_COLLECTION'
+                        CHECK (status IN (
+                          'PENDING_COLLECTION', 'COLLECTED', 'IN_PROGRESS',
+                          'COMPLETED', 'CANCELLED'
+                        )),
+  sample_barcode      TEXT         NOT NULL UNIQUE,
+  notes_enc           TEXT,
+  ordered_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  collected_at        TIMESTAMPTZ,
+  completed_at        TIMESTAMPTZ,
+  cancelled_reason    TEXT,
+  created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS lab_orders_patient_idx
+  ON {{schema}}.lab_orders (patient_id, ordered_at DESC);
+CREATE INDEX IF NOT EXISTS lab_orders_encounter_idx
+  ON {{schema}}.lab_orders (encounter_id);
+CREATE INDEX IF NOT EXISTS lab_orders_status_idx
+  ON {{schema}}.lab_orders (status);
+
+-- =============================================================================
+-- lab_order_items — one row per requested test within an order. Carries a
+-- per-test status so a multi-test panel can move tests through the workflow
+-- independently. PHI instructions (e.g. "fasting required") encrypted.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.lab_order_items (
+  id                  UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  lab_order_id        UUID         NOT NULL
+                        REFERENCES {{schema}}.lab_orders (id) ON DELETE CASCADE,
+  lab_test_id         UUID         NOT NULL
+                        REFERENCES {{schema}}.lab_tests (id) ON DELETE RESTRICT,
+  status              TEXT         NOT NULL DEFAULT 'PENDING'
+                        CHECK (status IN (
+                          'PENDING', 'IN_PROGRESS', 'RESULTED',
+                          'VERIFIED', 'CANCELLED'
+                        )),
+  instructions_enc    TEXT,
+  created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  UNIQUE (lab_order_id, lab_test_id)
+);
+
+CREATE INDEX IF NOT EXISTS lab_order_items_order_idx
+  ON {{schema}}.lab_order_items (lab_order_id);
+CREATE INDEX IF NOT EXISTS lab_order_items_test_idx
+  ON {{schema}}.lab_order_items (lab_test_id);
+
+-- =============================================================================
+-- lab_results — append-only ledger of result values. Each row snapshots the
+-- reference/critical ranges from the catalog at the moment of entry so a
+-- later edit to lab_tests cannot retroactively change a historical flag.
+-- Verification is a separate UPDATE on the existing row, not a new row, so
+-- the chain technician -> pathologist -> finalized stays linear.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.lab_results (
+  id                  UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  lab_order_item_id   UUID         NOT NULL
+                        REFERENCES {{schema}}.lab_order_items (id) ON DELETE CASCADE,
+  value_numeric       NUMERIC(14,4),
+  value_text          TEXT,
+  unit                TEXT,
+  flag                TEXT         NOT NULL DEFAULT 'NORMAL'
+                        CHECK (flag IN (
+                          'NORMAL', 'LOW', 'HIGH',
+                          'CRITICAL_LOW', 'CRITICAL_HIGH', 'ABNORMAL'
+                        )),
+  reference_low       NUMERIC(14,4),
+  reference_high      NUMERIC(14,4),
+  critical_low        NUMERIC(14,4),
+  critical_high       NUMERIC(14,4),
+  observed_at         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  entered_by_user_id  TEXT         NOT NULL,
+  verified_by_user_id TEXT,
+  verified_at         TIMESTAMPTZ,
+  notes_enc           TEXT,
+  created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  CHECK (
+    value_numeric IS NOT NULL OR value_text IS NOT NULL
+  )
+);
+
+CREATE INDEX IF NOT EXISTS lab_results_item_idx
+  ON {{schema}}.lab_results (lab_order_item_id, created_at DESC);
+
+-- =============================================================================
+-- PHASE B.3 — IMAGING (requests, studies, radiologist reports)
+-- =============================================================================
+
+-- =============================================================================
+-- imaging_requests — header for an ordered imaging study. Modality is a fixed
+-- set of common radiology modalities; `body_part` is free text to keep the
+-- schema flexible. `clinical_question_enc` is PHI (the reason for the study).
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.imaging_requests (
+  id                     UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  encounter_id           UUID         NOT NULL
+                           REFERENCES {{schema}}.encounters (id) ON DELETE RESTRICT,
+  patient_id             UUID         NOT NULL
+                           REFERENCES {{schema}}.patients (id) ON DELETE RESTRICT,
+  ordered_by_user_id     TEXT         NOT NULL,
+  modality               TEXT         NOT NULL
+                           CHECK (modality IN (
+                             'XRAY', 'CT', 'MRI', 'ULTRASOUND',
+                             'MAMMOGRAPHY', 'FLUOROSCOPY'
+                           )),
+  body_part              TEXT         NOT NULL,
+  priority               TEXT         NOT NULL DEFAULT 'ROUTINE'
+                           CHECK (priority IN ('ROUTINE', 'URGENT', 'STAT', 'EMERGENCY')),
+  status                 TEXT         NOT NULL DEFAULT 'REQUESTED'
+                           CHECK (status IN (
+                             'REQUESTED', 'SCHEDULED', 'IN_PROGRESS',
+                             'PERFORMED', 'REPORTED', 'CANCELLED'
+                           )),
+  clinical_question_enc  TEXT,
+  ordered_at             TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  scheduled_for          TIMESTAMPTZ,
+  cancelled_reason       TEXT,
+  created_at             TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at             TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS imaging_requests_patient_idx
+  ON {{schema}}.imaging_requests (patient_id, ordered_at DESC);
+CREATE INDEX IF NOT EXISTS imaging_requests_encounter_idx
+  ON {{schema}}.imaging_requests (encounter_id);
+CREATE INDEX IF NOT EXISTS imaging_requests_status_idx
+  ON {{schema}}.imaging_requests (status);
+
+-- =============================================================================
+-- imaging_studies — performance record. `dicom_object_keys` is an array of
+-- S3-style object keys that the eventual file-storage adapter will resolve.
+-- One request can produce multiple studies (e.g. re-takes), so this is N:1.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.imaging_studies (
+  id                    UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  imaging_request_id    UUID         NOT NULL
+                          REFERENCES {{schema}}.imaging_requests (id) ON DELETE CASCADE,
+  equipment_id          TEXT,
+  performed_by_user_id  TEXT         NOT NULL,
+  performed_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  protocol              TEXT,
+  image_count           INTEGER      NOT NULL DEFAULT 0 CHECK (image_count >= 0),
+  dicom_object_keys     TEXT[]       NOT NULL DEFAULT ARRAY[]::TEXT[],
+  notes_enc             TEXT,
+  created_at            TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS imaging_studies_request_idx
+  ON {{schema}}.imaging_studies (imaging_request_id);
+
+-- =============================================================================
+-- imaging_reports — radiologist reporting workflow. Status moves forward only
+-- (DRAFT -> PENDING_REVIEW -> REVIEWED -> FINALIZED); once FINALIZED the
+-- report is immutable. Findings / impression / recommendations are PHI.
+-- A study can have at most one report (UNIQUE on imaging_study_id).
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.imaging_reports (
+  id                      UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  imaging_study_id        UUID         NOT NULL UNIQUE
+                            REFERENCES {{schema}}.imaging_studies (id) ON DELETE CASCADE,
+  radiologist_user_id     TEXT         NOT NULL,
+  status                  TEXT         NOT NULL DEFAULT 'DRAFT'
+                            CHECK (status IN (
+                              'DRAFT', 'PENDING_REVIEW', 'REVIEWED', 'FINALIZED'
+                            )),
+  findings_enc            TEXT,
+  impression_enc          TEXT,
+  recommendations_enc     TEXT,
+  reviewer_user_id        TEXT,
+  signed_at               TIMESTAMPTZ,
+  created_at              TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at              TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS imaging_reports_status_idx
+  ON {{schema}}.imaging_reports (status);
+CREATE INDEX IF NOT EXISTS imaging_reports_radiologist_idx
+  ON {{schema}}.imaging_reports (radiologist_user_id);

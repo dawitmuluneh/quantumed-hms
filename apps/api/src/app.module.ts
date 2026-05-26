@@ -13,6 +13,8 @@ import { TenantModule } from './common/tenant/tenant.module';
 import { HealthController } from './health/health.controller';
 import { EncountersModule } from './modules/encounters/encounters.module';
 import { IdentityModule } from './modules/identity/identity.module';
+import { ImagingModule } from './modules/imaging/imaging.module';
+import { LaboratoryModule } from './modules/laboratory/laboratory.module';
 import { MultiHospitalModule } from './modules/multi-hospital/multi-hospital.module';
 import { PatientsModule } from './modules/patients/patients.module';
 import { PharmacyModule } from './modules/pharmacy/pharmacy.module';
@@ -45,6 +47,8 @@ import { TenancyModule } from './modules/tenancy/tenancy.module';
     SchedulingModule,
     PrescriptionsModule,
     PharmacyModule,
+    LaboratoryModule,
+    ImagingModule,
   ],
   controllers: [HealthController],
 })
