@@ -10,13 +10,18 @@ under a single Next.js app.
 
 This repository ships in phases:
 
-| Phase | Scope                                                                                                                                                                                                 | Status      |
-| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| A     | Monorepo, shared packages, NestJS + Next.js scaffolds, identity / tenancy / multi-hospital, cross-cutting concerns (encryption, audit, RBAC, tenant), i18n (6 locales), demo seed, docker-compose, CI | **this PR** |
-| B     | Clinical / operational modules (patients, encounters, prescriptions, pharmacy, lab, imaging, billing, hr, donor, referrals)                                                                           | upcoming    |
-| C     | Role-specific dashboards + complete UI                                                                                                                                                                | upcoming    |
-| D     | Testing & quality (contract, integration, perf, security)                                                                                                                                             | upcoming    |
-| E     | Docs, runbooks, Helm/Terraform, production readiness                                                                                                                                                  | upcoming    |
+| Phase | Scope                                                                                                                                                                                                 | Status                                                                              |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| A     | Monorepo, shared packages, NestJS + Next.js scaffolds, identity / tenancy / multi-hospital, cross-cutting concerns (encryption, audit, RBAC, tenant), i18n (6 locales), demo seed, docker-compose, CI | shipped (PR [#2](https://github.com/davidmuluneh/quantumed-hms/pull/2))             |
+| B.1   | Patients, encounters (with vitals + ICD-10 diagnoses), scheduling (resources, weekly schedules, appointments with no-overlap GIST)                                                                    | shipped (PR [#3](https://github.com/davidmuluneh/quantumed-hms/pull/3))             |
+| B.2   | Prescriptions (header + line items with PHI instructions), pharmacy (medicines catalog, lot-tracked inventory, atomic FEFO dispensing)                                                                | shipped, tested e2e (PR [#1](https://github.com/davidmuluneh/quantumed-hms/pull/1)) |
+| B.3   | Lab + imaging (orders, results, reports)                                                                                                                                                              | upcoming                                                                            |
+| B.4   | Billing, hr, donor, referrals                                                                                                                                                                         | upcoming                                                                            |
+| C     | Role-specific dashboards + complete UI                                                                                                                                                                | upcoming                                                                            |
+| D     | Testing & quality (contract, integration, perf, security)                                                                                                                                             | upcoming                                                                            |
+| E     | Docs, runbooks, Helm/Terraform, production readiness                                                                                                                                                  | upcoming                                                                            |
+
+Live repository status — what's shipped, what's open, what's next — is tracked in [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) and updated with every PR.
 
 ## Quick start
 
@@ -36,24 +41,26 @@ Full local-dev instructions: [`docs/runbooks/local-dev.md`](docs/runbooks/local-
 
 ## Demo users
 
-All seeded `*@demo.com` users share password `demo123` — for development only.
+All seeded `*@demo.com` users share password `demo123` — for development only. A bootstrap super-admin is also created as `superadmin@quantumed.local` with the password from `SUPER_ADMIN_BOOTSTRAP_PASSWORD` (default `ChangeMeOnFirstLogin!1`, `mustRotatePassword=true`).
 
-| Email                   | Role           |
-| ----------------------- | -------------- |
-| `superadmin@demo.com`   | super_admin    |
-| `admin@demo.com`        | admin          |
-| `doctor@demo.com`       | doctor         |
-| `nurse@demo.com`        | nurse          |
-| `receptionist@demo.com` | receptionist   |
-| `accountant@demo.com`   | accountant     |
-| `pharmacist@demo.com`   | pharmacist     |
-| `laboratorist@demo.com` | laboratorist   |
-| `radiologist@demo.com`  | radiologist    |
-| `hr@demo.com`           | hr_admin       |
-| `referral@demo.com`     | referral_admin |
-| `donor@demo.com`        | donor_admin    |
-| `telemedicine@demo.com` | telemedicine   |
-| `patient@demo.com`      | patient        |
+| Email                     | Role                  |
+| ------------------------- | --------------------- |
+| `doctor@demo.com`         | doctor                |
+| `nurse@demo.com`          | nurse                 |
+| `reception@demo.com`      | receptionist          |
+| `accountant@demo.com`     | accountant            |
+| `pharmacy@demo.com`       | pharmacist            |
+| `lab@demo.com`            | laboratorist          |
+| `imaging@demo.com`        | radiologist           |
+| `hr@demo.com`             | hr_admin              |
+| `referral@demo.com`       | referral_coordinator  |
+| `donor@demo.com`          | donor_coordinator     |
+| `telemed@demo.com`        | telemedicine_provider |
+| `notifications@demo.com`  | admin                 |
+| `patient@demo.com`        | patient               |
+| `patientgateway@demo.com` | patient               |
+
+`apps/api/prisma/seed.ts` is the source of truth for this list; the action plan calls for 14 `*@demo.com` accounts plus the bootstrap super-admin.
 
 ## Architecture
 
@@ -85,7 +92,10 @@ Six locales, loaded dynamically by `next-intl` from
 
 ```
 apps/
-  api/         NestJS 10 modular monolith (Phase A: identity, tenancy, multi-hospital)
+  api/         NestJS 10 modular monolith
+                 Phase A:   identity, tenancy, multi-hospital, audit, encryption, RBAC
+                 Phase B.1: patients, encounters, scheduling
+                 Phase B.2: prescriptions, pharmacy (medicines, inventory, dispenses)
   web/         Next.js 15 App Router with next-intl, RTL support, role-route stubs
   worker/      BullMQ background worker (scaffold)
 packages/

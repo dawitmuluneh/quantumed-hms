@@ -52,6 +52,20 @@ lint-staged run `prettier --write` on staged files via `pnpm prepare`.
 - All endpoints are protected by `AuthGuard` and `RbacGuard` by default. Use
   `@Public()` and `@RequirePermission(resource, action)` deliberately.
 
+## Repository status hygiene
+
+- **Every PR must update both [`README.md`](README.md) (phase-status table) and
+  [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) (Snapshot table +
+  "What's shipped per phase" detail) as part of the same PR.** These two files
+  are how a fresh reader (human or agent) figures out what's been built; out
+  of date is worse than missing.
+- When a phase moves to `shipped`, link the PR number on both files. If the
+  PR was end-to-end tested, link the test report from `docs/testing/`
+  alongside it in `PROJECT_STATUS.md`.
+- The action plan (`docs/action-plan.md`) is the spec and does not get
+  mutated by PRs — only `README.md` and `PROJECT_STATUS.md` move forward
+  with each merge.
+
 ## Translations
 
 - `packages/i18n/messages/en.json` is the source of truth. When adding keys,

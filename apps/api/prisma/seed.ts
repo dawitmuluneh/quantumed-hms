@@ -127,8 +127,9 @@ async function ensureDemoHospital(): Promise<{ id: string; schemaName: string }>
 }
 
 /**
- * Provisions the tenant schema and applies the Phase B.1 clinical DDL. Safe
- * to run repeatedly — the template uses `IF NOT EXISTS` for every object.
+ * Provisions the tenant schema and applies the canonical clinical DDL (Phase
+ * B.1 patients/encounters/scheduling + Phase B.2 prescriptions/pharmacy).
+ * Safe to run repeatedly — the template uses `IF NOT EXISTS` for every object.
  */
 async function provisionTenantSchema(schemaName: string): Promise<void> {
   if (!/^tenant_[a-z0-9_]{1,48}$/.test(schemaName)) {
@@ -148,7 +149,7 @@ async function provisionTenantSchema(schemaName: string): Promise<void> {
   for (const stmt of splitStatements(rendered)) {
     await prisma.$executeRawUnsafe(stmt);
   }
-  console.log(`[seed] tenant schema ${schemaName} provisioned (Phase B.1 DDL applied)`);
+  console.log(`[seed] tenant schema ${schemaName} provisioned (Phase B.1+B.2 DDL applied)`);
 }
 
 async function ensureUser(opts: {

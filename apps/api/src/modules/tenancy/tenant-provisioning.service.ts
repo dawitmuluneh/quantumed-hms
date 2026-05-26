@@ -11,9 +11,11 @@ const TEMPLATE_PLACEHOLDER = '{{schema}}';
 
 /**
  * Encapsulates the tenant-schema lifecycle. Phase A scaffolded the empty
- * `tenant_meta` table; Phase B.1 layers the clinical foundation on top —
- * patients, encounters, appointments, schedules, resources — provisioned
- * from the canonical `prisma/tenant-template.sql` DDL.
+ * `tenant_meta` table; Phase B.1 layered the clinical foundation on top
+ * (patients, encounters, appointments, schedules, resources); Phase B.2
+ * adds the prescriptions + pharmacy tables (medicines, inventory batches,
+ * dispenses). All DDL is provisioned from the canonical
+ * `prisma/tenant-template.sql`.
  */
 @Injectable()
 export class TenantProvisioningService {
@@ -59,8 +61,8 @@ export class TenantProvisioningService {
 
   /**
    * Re-applies the canonical tenant DDL against an existing schema. Idempotent
-   * (all statements are `IF NOT EXISTS`). Used by Phase B.1 to backfill the
-   * clinical tables onto demo tenants provisioned during Phase A.
+   * (all statements are `IF NOT EXISTS`). Used by Phase B.x to backfill new
+   * clinical tables onto demo tenants provisioned during earlier phases.
    */
   async applyTenantTemplate(schemaName: string): Promise<void> {
     if (!VALID_SCHEMA_RE.test(schemaName)) {

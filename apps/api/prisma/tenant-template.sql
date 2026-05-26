@@ -253,3 +253,146 @@ CREATE INDEX IF NOT EXISTS encounter_diagnoses_code_idx
 CREATE UNIQUE INDEX IF NOT EXISTS encounter_diagnoses_primary_uq
   ON {{schema}}.encounter_diagnoses (encounter_id)
   WHERE is_primary = TRUE;
+
+-- =============================================================================
+-- medicines — per-tenant formulary catalog. Codes are hospital-local SKUs;
+-- the optional `atc_code` ties back to the WHO ATC classification for
+-- interoperability with downstream reporting.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.medicines (
+  id            UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  code          TEXT         NOT NULL,
+  generic_name  TEXT         NOT NULL,
+  brand_name    TEXT,
+  form          TEXT         NOT NULL
+                  CHECK (form IN (
+                    'TABLET', 'CAPSULE', 'SYRUP', 'INJECTION',
+                    'CREAM', 'DROPS', 'INHALER', 'PATCH', 'OTHER'
+                  )),
+  strength      TEXT,
+  atc_code      TEXT,
+  is_controlled BOOLEAN      NOT NULL DEFAULT FALSE,
+  default_unit  TEXT         NOT NULL DEFAULT 'unit',
+  is_active     BOOLEAN      NOT NULL DEFAULT TRUE,
+  created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS medicines_code_uq
+  ON {{schema}}.medicines (code);
+CREATE INDEX IF NOT EXISTS medicines_generic_name_idx
+  ON {{schema}}.medicines (generic_name);
+CREATE INDEX IF NOT EXISTS medicines_active_idx
+  ON {{schema}}.medicines (is_active);
+
+-- =============================================================================
+-- pharmacy_inventory_batches — lot-tracked stock on hand. Quantity is in the
+-- medicine's `default_unit` (or an override per batch); we keep the unit on
+-- the batch so historical dispenses don't drift if the catalog default flips.
+-- The batch number is unique per medicine to keep FEFO (first-expiry-first-out)
+-- selection deterministic.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.pharmacy_inventory_batches (
+  id               UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  medicine_id      UUID         NOT NULL
+                     REFERENCES {{schema}}.medicines (id) ON DELETE RESTRICT,
+  lot_number       TEXT         NOT NULL,
+  expires_on       DATE         NOT NULL,
+  quantity_on_hand INTEGER      NOT NULL CHECK (quantity_on_hand >= 0),
+  unit             TEXT         NOT NULL,
+  location         TEXT,
+  received_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  created_at       TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at       TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS pharmacy_inventory_batches_med_lot_uq
+  ON {{schema}}.pharmacy_inventory_batches (medicine_id, lot_number);
+CREATE INDEX IF NOT EXISTS pharmacy_inventory_batches_med_exp_idx
+  ON {{schema}}.pharmacy_inventory_batches (medicine_id, expires_on);
+
+-- =============================================================================
+-- prescriptions — header row per prescribing event. One encounter can have
+-- multiple prescriptions (e.g. a revision after lab results); status is the
+-- server-side state machine.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.prescriptions (
+  id                 UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  encounter_id       UUID         NOT NULL
+                       REFERENCES {{schema}}.encounters (id) ON DELETE RESTRICT,
+  patient_id         UUID         NOT NULL
+                       REFERENCES {{schema}}.patients (id) ON DELETE RESTRICT,
+  prescriber_user_id TEXT         NOT NULL,
+  status             TEXT         NOT NULL DEFAULT 'ACTIVE'
+                       CHECK (status IN ('ACTIVE', 'COMPLETED', 'CANCELLED', 'SUPERSEDED')),
+  notes_enc          TEXT,
+  issued_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  cancelled_reason   TEXT,
+  created_at         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at         TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS prescriptions_encounter_idx
+  ON {{schema}}.prescriptions (encounter_id);
+CREATE INDEX IF NOT EXISTS prescriptions_patient_idx
+  ON {{schema}}.prescriptions (patient_id, issued_at DESC);
+CREATE INDEX IF NOT EXISTS prescriptions_status_idx
+  ON {{schema}}.prescriptions (status);
+
+-- =============================================================================
+-- prescription_items — one row per line item. `quantity_to_dispense` is the
+-- total dispensable quantity in `medicine.default_unit` units; pharmacy
+-- dispenses subtract from this implicitly via the dispense ledger.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.prescription_items (
+  id                   UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  prescription_id      UUID         NOT NULL
+                         REFERENCES {{schema}}.prescriptions (id) ON DELETE CASCADE,
+  medicine_id          UUID         NOT NULL
+                         REFERENCES {{schema}}.medicines (id) ON DELETE RESTRICT,
+  dose                 TEXT         NOT NULL,
+  route                TEXT         NOT NULL
+                         CHECK (route IN (
+                           'ORAL', 'IV', 'IM', 'SC', 'TOPICAL',
+                           'INHALED', 'OPHTHALMIC', 'OTIC',
+                           'NASAL', 'RECTAL', 'OTHER'
+                         )),
+  frequency            TEXT         NOT NULL,
+  duration_days        INTEGER      CHECK (duration_days IS NULL OR (duration_days BETWEEN 1 AND 365)),
+  quantity_to_dispense INTEGER      NOT NULL CHECK (quantity_to_dispense > 0),
+  prn                  BOOLEAN      NOT NULL DEFAULT FALSE,
+  prn_reason           TEXT,
+  instructions_enc     TEXT,
+  created_at           TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS prescription_items_prescription_idx
+  ON {{schema}}.prescription_items (prescription_id);
+CREATE INDEX IF NOT EXISTS prescription_items_medicine_idx
+  ON {{schema}}.prescription_items (medicine_id);
+
+-- =============================================================================
+-- pharmacy_dispenses — append-only ledger of stock movements out of inventory.
+-- The dispense service performs the deduction in a single SQL statement that
+-- conditions on `quantity_on_hand >= dispensed_qty`, so we never double-spend.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS {{schema}}.pharmacy_dispenses (
+  id                   UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  prescription_item_id UUID         NOT NULL
+                         REFERENCES {{schema}}.prescription_items (id) ON DELETE RESTRICT,
+  batch_id             UUID         NOT NULL
+                         REFERENCES {{schema}}.pharmacy_inventory_batches (id) ON DELETE RESTRICT,
+  quantity             INTEGER      NOT NULL CHECK (quantity > 0),
+  unit                 TEXT         NOT NULL,
+  dispensed_by_user_id TEXT         NOT NULL,
+  dispensed_at         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  notes                TEXT,
+  created_at           TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS pharmacy_dispenses_item_idx
+  ON {{schema}}.pharmacy_dispenses (prescription_item_id);
+CREATE INDEX IF NOT EXISTS pharmacy_dispenses_batch_idx
+  ON {{schema}}.pharmacy_dispenses (batch_id);
+CREATE INDEX IF NOT EXISTS pharmacy_dispenses_dispensed_at_idx
+  ON {{schema}}.pharmacy_dispenses (dispensed_at DESC);

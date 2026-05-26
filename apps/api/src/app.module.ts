@@ -15,6 +15,8 @@ import { EncountersModule } from './modules/encounters/encounters.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { MultiHospitalModule } from './modules/multi-hospital/multi-hospital.module';
 import { PatientsModule } from './modules/patients/patients.module';
+import { PharmacyModule } from './modules/pharmacy/pharmacy.module';
+import { PrescriptionsModule } from './modules/prescriptions/prescriptions.module';
 import { SchedulingModule } from './modules/scheduling/scheduling.module';
 import { TenancyModule } from './modules/tenancy/tenancy.module';
 
@@ -41,6 +43,8 @@ import { TenancyModule } from './modules/tenancy/tenancy.module';
     PatientsModule,
     EncountersModule,
     SchedulingModule,
+    PrescriptionsModule,
+    PharmacyModule,
   ],
   controllers: [HealthController],
 })
