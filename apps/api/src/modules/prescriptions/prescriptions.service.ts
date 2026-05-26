@@ -266,16 +266,25 @@ export class PrescriptionsService {
       throw new ValidationError('cancelledReason is required when status=CANCELLED');
     }
 
+    // Compare-and-swap on `status`. The UPDATE takes effect only if the row
+    // is still in the state the prior SELECT observed; a concurrent transition
+    // races us out and we surface a 409 so the caller can reload and retry.
     const headerRows = await this.prisma.$queryRaw<PrescriptionRow[]>(Prisma.sql`
       UPDATE ${schemaIdent}.prescriptions
       SET status = ${input.status},
           cancelled_reason = ${input.cancelledReason ?? null},
           updated_at = NOW()
       WHERE id = ${id}::uuid
+        AND status = ${existing.status}
       RETURNING *
     `);
     const header = headerRows[0];
-    if (!header) throw new NotFoundError('prescription', id);
+    if (!header) {
+      throw new ConflictError(
+        'Prescription status was modified concurrently; please reload and retry',
+        'PRESCRIPTION_TRANSITION_CONFLICT',
+      );
+    }
 
     await this.audit.write({
       hospitalId: ctx.hospitalId,

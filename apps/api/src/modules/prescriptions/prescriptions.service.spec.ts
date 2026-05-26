@@ -217,5 +217,14 @@ describe('PrescriptionsService', () => {
         svc.updateStatus('rx-1', { status: 'CANCELLED' }, 'doctor-1'),
       ).rejects.toBeInstanceOf(ValidationError);
     });
+
+    it('raises 409 PRESCRIPTION_TRANSITION_CONFLICT when the compare-and-swap UPDATE matches zero rows (concurrent transition won the race)', async () => {
+      prisma.responses.push([{ id: 'rx-1', status: 'ACTIVE' }]);
+      prisma.responses.push([]);
+      const result = svc.updateStatus('rx-1', { status: 'COMPLETED' }, 'pharmacist-1');
+      await expect(result).rejects.toBeInstanceOf(ConflictError);
+      await expect(result).rejects.toMatchObject({ code: 'PRESCRIPTION_TRANSITION_CONFLICT' });
+      expect(mockAudit.write).not.toHaveBeenCalled();
+    });
   });
 });
