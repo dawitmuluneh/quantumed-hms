@@ -31,11 +31,14 @@ interface ImagingReportRow {
 
 /**
  * Radiologist report status transitions. Forward-only — once FINALIZED the
- * report is immutable. REVIEWED requires a reviewer distinct from the
- * radiologist (industry pattern: 4-eyes for the diagnostic record).
+ * report is immutable. FINALIZED is reachable only from REVIEWED, and
+ * REVIEWED requires a reviewer distinct from the radiologist
+ * (industry pattern: 4-eyes for the diagnostic record). A DRAFT cannot
+ * be finalized directly because that would bypass the self-review check
+ * that only fires on the REVIEWED transition.
  */
 const STATUS_TRANSITIONS: Record<ImagingReportStatus, ImagingReportStatus[]> = {
-  DRAFT: ['PENDING_REVIEW', 'FINALIZED'],
+  DRAFT: ['PENDING_REVIEW'],
   PENDING_REVIEW: ['REVIEWED', 'DRAFT'],
   REVIEWED: ['FINALIZED', 'DRAFT'],
   FINALIZED: [],

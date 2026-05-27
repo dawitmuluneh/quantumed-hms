@@ -140,6 +140,17 @@ describe('ImagingReportsService', () => {
       ).rejects.toBeInstanceOf(ConflictError);
     });
 
+    it('rejects DRAFT -> FINALIZED to enforce mandatory peer review', async () => {
+      prisma.responses.push([
+        { id: 'rep-1', imaging_study_id: 'study-1', radiologist_user_id: 'rad-1', status: 'DRAFT' },
+      ]);
+      const p = svc.updateStatus('rep-1', { status: 'FINALIZED' }, 'rad-1');
+      await expect(p).rejects.toBeInstanceOf(ConflictError);
+      await expect(p).rejects.toMatchObject({ code: 'IMAGING_REPORT_TRANSITION_INVALID' });
+      expect(mockAudit.write).not.toHaveBeenCalled();
+      expect(mockRequests.markReportedInTx).not.toHaveBeenCalled();
+    });
+
     it('raises TRANSITION_CONFLICT when the compare-and-swap matches zero rows', async () => {
       prisma.responses.push([
         {
